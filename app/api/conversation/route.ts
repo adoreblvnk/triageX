@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     `;
 
     const { text: logicResultText } = await generateText({
-      model: google('models/gemini-2.5-flash-lite'),
+      model: google('gemini-2.5-flash-lite'),
       prompt: logicPrompt,
     });
 
