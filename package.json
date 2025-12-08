@@ -9,12 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/elevenlabs": "^1.0.20",
     "@ai-sdk/google": "^2.0.44",
     "@ai-sdk/groq": "^2.0.32",
     "@elevenlabs/elevenlabs-js": "^2.26.0",
     "ai": "^5.0.108",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.23.25",
     "geist": "^1.5.1",
     "lucide-react": "^0.556.0",

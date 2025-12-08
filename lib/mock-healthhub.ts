@@ -1,46 +1,32 @@
-// lib/mock-healthhub.ts
-export interface Persona {
-  id: string;
-  name: string;
-  age: number;
-  history: string[];
-  avatar: string; // simple emoji for now
-}
+import { Persona } from '@/types';
 
 export const mockPersonas: Persona[] = [
   {
-    id: 'uncle-tan',
-    name: 'Uncle Tan',
-    age: 65,
-    history: ['Hypertension', 'Type 2 Diabetes'],
-    avatar: '👴',
+    id: 'dr-elara-vance',
+    name: 'Dr. Elara Vance',
+    title: 'Chief Medical Officer',
+    specialty: 'Cardiology',
+    avatar: '/avatars/dr-vance.jpg',
   },
   {
-    id: 'aunty-lim',
-    name: 'Aunty Lim',
-    age: 72,
-    history: ['Osteoarthritis', 'High Cholesterol'],
-    avatar: '👵',
+    id: 'dr-kenji-tanaka',
+    name: 'Dr. Kenji Tanaka',
+    title: 'Head of Surgery',
+    specialty: 'Neurology',
+    avatar: '/avatars/dr-tanaka.jpg',
   },
   {
-    id: 'chen',
-    name: 'Ah Beng',
-    age: 28,
-    history: ['Asthma (childhood)', 'None'],
-    avatar: '👨‍💻',
+    id: 'dr-anya-sharma',
+    name: 'Dr. Anya Sharma',
+    title: 'Pediatric Specialist',
+    specialty: 'Pediatrics',
+    avatar: '/avatars/dr-sharma.jpg',
   },
   {
-    id: 'siti',
-    name: 'Siti',
-    age: 45,
-    history: ['Migraines'],
-    avatar: '👩‍🏫',
-  },
-  {
-    id: 'kumar',
-    name: 'Mr. Kumar',
-    age: 58,
-    history: ['Coronary Artery Disease', 'Gout'],
-    avatar: '👨‍💼',
+    id: 'dr-leo-galloway',
+    name: 'Dr. Leo Galloway',
+    title: 'Emergency Medicine',
+    specialty: 'Trauma',
+    avatar: '/avatars/dr-galloway.jpg',
   },
 ];

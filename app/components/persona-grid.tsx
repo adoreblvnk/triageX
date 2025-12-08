@@ -1,34 +1,44 @@
 'use client';
-import { motion } from 'framer-motion';
+
 import { mockPersonas } from '@/lib/mock-healthhub';
 import { useTriage } from '@/app/providers/triage-provider';
-import { cn } from '@/lib/utils';
+import { Persona } from '@/types';
+import { ChevronRight } from 'lucide-react';
 
 export function PersonaGrid() {
-  const { dispatch, state } = useTriage();
+  const { setSelectedPersona } = useTriage();
+
+  const handleSelect = (persona: Persona) => {
+    setSelectedPersona(persona);
+  };
 
   return (
-    <div className="w-full">
-        <h2 className="font-sans text-2xl mb-4 border-b border-zinc-800 pb-2">SELECT PATIENT PROFILE</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px bg-zinc-800 border border-zinc-800">
-        {mockPersonas.map((persona) => (
-            <motion.div
+    <div className="border border-zinc-800">
+      <div className="p-4 border-b border-zinc-800">
+        <h2 className="text-xl font-bold">Select a Triage Persona</h2>
+        <p className="text-zinc-400 text-sm">
+          Choose a specialist to begin your consultation.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {mockPersonas.map((persona, index) => (
+          <button
             key={persona.id}
-            onClick={() => dispatch({ type: 'SELECT_PERSONA', payload: persona })}
-            className={cn(
-                'group p-4 bg-black cursor-pointer',
-                'hover:bg-zinc-100 hover:text-black transition-colors duration-200',
-                 state.currentPersona?.id === persona.id && 'bg-zinc-100 text-black'
-            )}
-            whileTap={{ scale: 0.98 }}
-            >
-            <div className="text-4xl mb-4">{persona.avatar}</div>
-            <h3 className="font-sans text-lg font-bold">{persona.name}</h3>
-            <p className="font-mono text-sm opacity-70">{persona.age} years old</p>
-            <p className="font-mono text-xs mt-2 opacity-50">{persona.history.join(', ')}</p>
-            </motion.div>
+            onClick={() => handleSelect(persona)}
+            className={`p-6 text-left hover:bg-zinc-900 transition-colors duration-200 flex justify-between items-center
+              ${index % 2 === 0 ? 'border-r border-zinc-800' : ''}
+              ${index < mockPersonas.length - 2 ? 'border-b border-zinc-800' : ''}
+            `}
+          >
+            <div>
+              <p className="text-lg font-semibold">{persona.name}</p>
+              <p className="text-sm text-zinc-400">{persona.title}</p>
+              <p className="text-sm text-red-600 mt-1">{persona.specialty}</p>
+            </div>
+            <ChevronRight className="w-6 h-6 text-zinc-600" />
+          </button>
         ))}
-        </div>
+      </div>
     </div>
   );
 }

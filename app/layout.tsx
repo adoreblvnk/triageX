@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { Fira_Code } from "next/font/google";
 import "./globals.css";
-import { TriageProvider } from "./providers/triage-provider";
+import { TriageProvider } from "@/app/providers/triage-provider";
 import { cn } from "@/lib/utils";
 
 const firaCode = Fira_Code({
