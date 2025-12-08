@@ -6,6 +6,7 @@ import { experimental_transcribe as transcribe } from 'ai';
 import { generateText } from 'ai';
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Message } from '@/types';
+import { Buffer } from 'buffer'; // Explicitly import Buffer
 
 const elevenlabsClient = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY,
@@ -36,7 +37,7 @@ async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffe
         if (done) {
             break;
         }
-        chunks.push(value);
+        chunks.push(Buffer.from(value)); // Ensure each chunk is a Buffer
     }
     return Buffer.concat(chunks);
 }
@@ -62,11 +63,11 @@ export async function POST(req: NextRequest) {
         const isolatedAudioStream = await elevenlabsClient.audioIsolation.convert({
             audio: audioBlob,
         });
-        const chunks = [];
+        const uint8Chunks: Uint8Array[] = [];
         for await (const chunk of streamToAsyncIterable(isolatedAudioStream)) {
-            chunks.push(chunk);
+            uint8Chunks.push(chunk);
         }
-        isolatedAudioBuffer = Buffer.concat(chunks);
+        isolatedAudioBuffer = Buffer.concat(uint8Chunks.map(c => Buffer.from(c))); // Map to Buffer
     } catch (error: any) {
         if (error?.body?.detail?.status === 'invalid_audio_duration') {
             console.log('Audio duration too short for isolation, proceeding with original audio.');
