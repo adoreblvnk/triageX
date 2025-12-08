@@ -26,3 +26,13 @@ export interface TriageState {
   selectedPersona: Persona | null;
   triageTicket: TriageTicket | null;
 }
+
+export interface TriageContextType extends TriageState {
+  setConversation: (conversation: Message[]) => void;
+  addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void;
+  setStatus: (status: TriageState['status']) => void;
+  setSelectedPersona: (persona: Persona | null) => void;
+  playAudio: (audioBase64: string) => void;
+  resetTriage: () => void;
+  setTriageTicket: (ticket: TriageTicket | null) => void;
+}

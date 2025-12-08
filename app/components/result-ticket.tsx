@@ -1,26 +1,7 @@
 'use client';
 
-import { useTriage } from "@/providers/triage-provider";
+import { useTriage } from "@/app/providers/triage-provider";
 import { TriageTicket } from "@/types";
-
-// NOTE: This is a placeholder. In a real app, you'd fetch this from the TriageContext.
-const mockTicket: TriageTicket = {
-    urgency: 'high',
-    specialty: 'Cardiology',
-    reasoning: `
-        Gemini-2.5-Pro: The patient's description of chest pain radiating to the left arm, combined with shortness of breath, is highly indicative of a potential cardiac event, such as angina or myocardial infarction. Immediate evaluation is critical.
-        GPT-OSS-120b: [GPT-OSS-120b MOCK] Patient is exhibiting classic signs of acute coronary syndrome. The chest pain description is a major indicator.
-        Llama-4-Maverick: [LLAMA-4-MAVERICK MOCK] The radiating pain and shortness of breath strongly suggest a cardiac event. Immediate workup is necessary.
-    `.trim(),
-    suggestedActions: [
-        'Administer aspirin',
-        'Perform ECG immediately',
-        'Prepare for cardiac catheterization',
-        'Check vital signs continuously',
-        'Administer oxygen',
-        'Draw blood for cardiac enzyme tests'
-    ],
-};
 
 
 const UrgencyPill = ({ urgency }: { urgency: TriageTicket['urgency'] }) => {
@@ -39,9 +20,8 @@ const UrgencyPill = ({ urgency }: { urgency: TriageTicket['urgency'] }) => {
 }
 
 export function ResultTicket() {
-    // const { triageTicket } = useTriage();
-    // if (!triageTicket) return null;
-    const triageTicket = mockTicket; // Replace with context
+    const { triageTicket } = useTriage();
+    if (!triageTicket) return null; // Handle case where ticket is not yet available
 
     return (
         <div className="w-full border border-zinc-700 bg-zinc-950 p-6 text-left animate-fade-in">

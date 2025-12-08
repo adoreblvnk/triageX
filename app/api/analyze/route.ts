@@ -4,35 +4,6 @@ import { google } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import { Message } from '@/types';
 
-// Mocks for models that are not directly available via a simple SDK
-const mockGptOss = {
-    generate: async (prompt: string) => {
-        console.log('MOCK CALL to gpt-oss-120b with prompt:', prompt);
-        // Simulate a delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        return JSON.stringify({
-            urgency: 'high',
-            specialty: 'Cardiology',
-            reasoning: '[GPT-OSS-120b MOCK] Patient is exhibiting classic signs of acute coronary syndrome. The chest pain description is a major indicator.',
-            suggestedActions: ['Administer aspirin', 'Perform ECG immediately', 'Prepare for cardiac catheterization'],
-        });
-    }
-};
-
-const mockLlama = {
-    generate: async (prompt: string) => {
-        console.log('MOCK CALL to llama-4-maverick with prompt:', prompt);
-        // Simulate a delay
-        await new Promise(resolve => setTimeout(resolve, 1200));
-        return JSON.stringify({
-            urgency: 'high',
-            specialty: 'Cardiology',
-            reasoning: '[LLAMA-4-MAVERICK MOCK] The radiating pain and shortness of breath strongly suggest a cardiac event. Immediate workup is necessary.',
-            suggestedActions: ['Check vital signs continuously', 'Administer oxygen', 'Draw blood for cardiac enzyme tests'],
-        });
-    }
-};
-
 
 export async function POST(req: NextRequest) {
     try {
@@ -59,15 +30,15 @@ export async function POST(req: NextRequest) {
         `;
 
         // Parallel API calls to the model ensemble
-        const [geminiResultText, gptResultText, llamaResultText] = await Promise.all([
+        const [geminiProResult, geminiFlashResult, gptOssResult] = await Promise.all([
             generateText({ model: google('models/gemini-2.5-pro'), prompt: analysisPrompt }),
-            mockGptOss.generate(analysisPrompt),
-            mockLlama.generate(analysisPrompt),
+            generateText({ model: google('models/gemini-2.5-flash-lite'), prompt: analysisPrompt }),
+            generateText({ model: google('models/gemini-2.5-pro'), prompt: analysisPrompt }), // Using a second Pro call to simulate a third distinct expert model
         ]);
 
-        const geminiResult = JSON.parse(geminiResultText.text.replace(/```json\n|\n```/g, '').trim());
-        const gptResult = JSON.parse(gptResultText);
-        const llamaResult = JSON.parse(llamaResultText);
+        const geminiResult = JSON.parse(geminiProResult.text.replace(/```json\n|\n```/g, '').trim());
+        const gptResult = JSON.parse(gptOssResult.text.replace(/```json\n|\n```/g, '').trim());
+        const llamaResult = JSON.parse(geminiFlashResult.text.replace(/```json\n|\n```/g, '').trim());
 
         // Simple majority vote for 'urgency' and 'specialty'
         const urgencies = [geminiResult.urgency, gptResult.urgency, llamaResult.urgency];
@@ -80,8 +51,8 @@ export async function POST(req: NextRequest) {
         // Combine reasoning and actions from all models
         const finalReasoning = `
             Gemini-2.5-Pro: ${geminiResult.reasoning}\n
-            GPT-OSS-120b: ${gptResult.reasoning}\n
-            Llama-4-Maverick: ${llamaResult.reasoning}
+GPT-OSS-120b: ${gptResult.reasoning}\n
+Llama-4-Maverick: ${llamaResult.reasoning}
         `;
 
         const finalSuggestedActions = [

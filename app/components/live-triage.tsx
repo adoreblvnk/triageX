@@ -4,17 +4,18 @@ import { useState, useRef, useEffect } from 'react';
 import { useTriage } from '@/app/providers/triage-provider';
 import { Mic, Square, LoaderCircle } from 'lucide-react';
 import { ResultTicket } from './result-ticket';
+import { AnimatedTranscript } from './animated-transcript';
 
 const AudioWaveform = () => {
   // A simple placeholder for a waveform visualization
   return (
-    <div className="flex items-center justify-center space-x-1 h-24">
+    <div className="flex items-center justify-center space-x-1 h-12">
       {[...Array(20)].map((_, i) => (
         <div
           key={i}
           className="w-1 bg-red-600 animate-pulse"
           style={{
-            height: `${Math.random() * 60 + 10}px`,
+            height: `${Math.random() * 40 + 10}px`,
             animationDelay: `${i * 100}ms`,
             animationDuration: '1.5s',
           }}
@@ -33,9 +34,11 @@ export function LiveTriage() {
     conversation,
     selectedPersona,
     resetTriage,
+    setTriageTicket, // This is imported here
   } = useTriage();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [aiSpeakingText, setAiSpeakingText] = useState('');
 
   const startRecording = async () => {
     try {
@@ -50,14 +53,12 @@ export function LiveTriage() {
       setStatus('recording');
     } catch (err) {
       console.error('Error accessing microphone:', err);
-      // You might want to show an error to the user here
     }
   };
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && status === 'recording') {
       mediaRecorderRef.current.stop();
-      // The onstop event will trigger the handleStopRecording function
     }
   };
 
@@ -88,8 +89,9 @@ export function LiveTriage() {
 
       if (result.status === 'continue' && result.aiResponseText) {
         addMessage({ role: 'assistant', text: result.aiResponseText });
+        setAiSpeakingText(result.aiResponseText);
         if(result.aiAudioBase64){
-            playAudio(result.aiAudioBase64); // This will set status to 'speaking'
+            playAudio(result.aiAudioBase64); 
         } else {
             setStatus('idle');
         }
@@ -114,14 +116,17 @@ export function LiveTriage() {
                 body: JSON.stringify({ conversationHistory: conversation, personaContext: selectedPersona }),
             });
             if (!res.ok) throw new Error('Analysis failed');
+            
             const ticket = await res.json();
-            // This is where you would set the ticket in the context
-             console.log('Triage Ticket:', ticket);
-             // For now, let's just log it and set status to complete
+            
+            // --- FIX IS HERE ---
+            setTriageTicket(ticket); // Actually update state
             setStatus('complete');
+            // -------------------
+
         } catch (error) {
             console.error('Error during analysis:', error);
-            setStatus('idle'); // Or an error state
+            setStatus('idle'); 
         }
     };
 
@@ -145,9 +150,9 @@ export function LiveTriage() {
         );
       case 'speaking':
         return (
-            <div className="flex flex-col items-center justify-center h-48">
+            <div className="flex flex-col items-center justify-center h-48 w-full">
+                <AnimatedTranscript text={aiSpeakingText} />
                 <AudioWaveform />
-                <p className="mt-4 text-zinc-400">AI is speaking...</p>
             </div>
         );
       case 'complete':

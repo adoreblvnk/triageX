@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import { TriageState, Message, Persona } from '@/types';
+import { TriageState, Message, Persona, TriageTicket } from '@/types';
 
 interface TriageContextType extends TriageState {
   setConversation: (conversation: Message[]) => void;
@@ -10,6 +10,7 @@ interface TriageContextType extends TriageState {
   setSelectedPersona: (persona: Persona | null) => void;
   playAudio: (audioBase64: string) => void;
   resetTriage: () => void;
+  setTriageTicket: (ticket: TriageTicket | null) => void;
 }
 
 const TriageContext = createContext<TriageContextType | undefined>(undefined);
@@ -63,6 +64,10 @@ export const TriageProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const setTriageTicket = (ticket: TriageTicket | null) => {
+    setState(prevState => ({ ...prevState, triageTicket: ticket }));
+  };
+
   const resetTriage = () => {
     setState(initialState);
   };
@@ -75,6 +80,7 @@ export const TriageProvider = ({ children }: { children: ReactNode }) => {
     setSelectedPersona,
     playAudio,
     resetTriage,
+    setTriageTicket,
   };
 
   return <TriageContext.Provider value={value}>{children}</TriageContext.Provider>;
