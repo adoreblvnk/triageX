@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useTriage } from '@/app/providers/triage-provider';
 import { Mic, Square, LoaderCircle } from 'lucide-react';
 import { ResultTicket } from './result-ticket';
@@ -32,9 +32,10 @@ export function LiveTriage() {
     addMessage,
     playAudio,
     conversation,
-    selectedPersona,
+    selectedPatient,
+    medicalHistory,
     resetTriage,
-    setTriageTicket, // This is imported here
+    setTriageTicket,
   } = useTriage();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -69,7 +70,8 @@ export function LiveTriage() {
     const formData = new FormData();
     formData.append('audio', audioBlob);
     formData.append('conversationHistory', JSON.stringify(conversation));
-    formData.append('personaContext', JSON.stringify(selectedPersona));
+    formData.append('patientContext', JSON.stringify(selectedPatient));
+    formData.append('medicalHistory', medicalHistory);
 
     try {
       const response = await fetch('/api/conversation', {
@@ -113,16 +115,18 @@ export function LiveTriage() {
             const res = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ conversationHistory: conversation, personaContext: selectedPersona }),
+                body: JSON.stringify({ 
+                    conversationHistory: conversation, 
+                    patientContext: selectedPatient,
+                    medicalHistory 
+                }),
             });
             if (!res.ok) throw new Error('Analysis failed');
             
             const ticket = await res.json();
             
-            // --- FIX IS HERE ---
-            setTriageTicket(ticket); // Actually update state
+            setTriageTicket(ticket);
             setStatus('complete');
-            // -------------------
 
         } catch (error) {
             console.error('Error during analysis:', error);
@@ -200,10 +204,23 @@ export function LiveTriage() {
 
   return (
     <div className="w-full border border-zinc-800 bg-black p-8 flex flex-col items-center">
-        <div className="w-full text-left mb-4">
-            <p className="text-zinc-400">Consulting with:</p>
-            <h2 className="text-2xl font-bold">{selectedPersona?.name}</h2>
-            <p className="text-red-600">{selectedPersona?.specialty}</p>
+        <div className="w-full text-left mb-4 flex justify-between items-end">
+            <div>
+                <p className="text-zinc-400 text-sm">Patient Profile:</p>
+                <h2 className="text-2xl font-bold">{selectedPatient?.name}</h2>
+                <div className="flex items-center gap-2 text-sm text-zinc-500">
+                    <span>{selectedPatient?.age} y/o</span>
+                    <span>•</span>
+                    <span>{selectedPatient?.nric}</span>
+                </div>
+            </div>
+            {medicalHistory && (
+                <div className="hidden md:block text-right">
+                    <span className="text-xs px-2 py-1 border border-green-800 bg-green-900/20 text-green-400 rounded">
+                        HealthHub Data Synced
+                    </span>
+                </div>
+            )}
         </div>
       <div className="w-full min-h-[250px] flex items-center justify-center">
         {renderContent()}

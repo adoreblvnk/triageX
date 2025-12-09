@@ -1,32 +1,28 @@
-import { Persona } from '@/types';
+import { PatientProfile } from '@/types';
 
-export const mockPersonas: Persona[] = [
+export const mockPatients: PatientProfile[] = [
   {
-    id: 'dr-elara-vance',
-    name: 'Dr. Elara Vance',
-    title: 'Chief Medical Officer',
-    specialty: 'Cardiology',
-    avatar: '/avatars/dr-vance.jpg',
+    id: 'patient-001',
+    name: 'Uncle Tan',
+    age: 68,
+    nric: 'S****123A',
+    chronicConditions: ['Hypertension', 'Hyperlipidemia'],
+    avatar: '/avatars/uncle-tan.jpg', // Placeholder
   },
   {
-    id: 'dr-kenji-tanaka',
-    name: 'Dr. Kenji Tanaka',
-    title: 'Head of Surgery',
-    specialty: 'Neurology',
-    avatar: '/avatars/dr-tanaka.jpg',
+    id: 'patient-002',
+    name: 'John Leow',
+    age: 45,
+    nric: 'S****567B',
+    chronicConditions: ['Type 2 Diabetes'],
+    avatar: '/avatars/john-leow.jpg', // Placeholder
   },
   {
-    id: 'dr-anya-sharma',
-    name: 'Dr. Anya Sharma',
-    title: 'Pediatric Specialist',
-    specialty: 'Pediatrics',
-    avatar: '/avatars/dr-sharma.jpg',
-  },
-  {
-    id: 'dr-leo-galloway',
-    name: 'Dr. Leo Galloway',
-    title: 'Emergency Medicine',
-    specialty: 'Trauma',
-    avatar: '/avatars/dr-galloway.jpg',
+    id: 'patient-003',
+    name: 'Sarah Lim',
+    age: 29,
+    nric: 'S****890C',
+    chronicConditions: ['Asthma'],
+    avatar: '/avatars/sarah-lim.jpg', // Placeholder
   },
 ];

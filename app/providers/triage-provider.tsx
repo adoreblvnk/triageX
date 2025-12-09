@@ -1,13 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import { TriageState, Message, Persona, TriageTicket } from '@/types';
+import { TriageState, Message, PatientProfile, TriageTicket } from '@/types';
 
 interface TriageContextType extends TriageState {
   setConversation: (conversation: Message[]) => void;
   addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void;
   setStatus: (status: TriageState['status']) => void;
-  setSelectedPersona: (persona: Persona | null) => void;
+  setSelectedPatient: (patient: PatientProfile | null) => void;
+  setMedicalHistory: (history: string) => void;
   playAudio: (audioBase64: string) => void;
   resetTriage: () => void;
   setTriageTicket: (ticket: TriageTicket | null) => void;
@@ -18,7 +19,8 @@ const TriageContext = createContext<TriageContextType | undefined>(undefined);
 const initialState: TriageState = {
   status: 'idle',
   conversation: [],
-  selectedPersona: null,
+  selectedPatient: null,
+  medicalHistory: '',
   triageTicket: null,
 };
 
@@ -45,8 +47,12 @@ export const TriageProvider = ({ children }: { children: ReactNode }) => {
     setState(prevState => ({ ...prevState, status }));
   };
 
-  const setSelectedPersona = (persona: Persona | null) => {
-    setState(prevState => ({ ...prevState, selectedPersona: persona }));
+  const setSelectedPatient = (patient: PatientProfile | null) => {
+    setState(prevState => ({ ...prevState, selectedPatient: patient }));
+  };
+
+  const setMedicalHistory = (history: string) => {
+    setState(prevState => ({ ...prevState, medicalHistory: history }));
   };
 
   const playAudio = (audioBase64: string) => {
@@ -77,7 +83,8 @@ export const TriageProvider = ({ children }: { children: ReactNode }) => {
     setConversation,
     addMessage,
     setStatus,
-    setSelectedPersona,
+    setSelectedPatient,
+    setMedicalHistory,
     playAudio,
     resetTriage,
     setTriageTicket,

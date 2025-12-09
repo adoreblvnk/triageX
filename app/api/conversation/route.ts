@@ -48,10 +48,13 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const audioBlob = formData.get('audio') as Blob;
     const conversationHistoryJson = formData.get('conversationHistory') as string;
-    const personaContextJson = formData.get('personaContext') as string;
+    
+    // Updated data retrieval
+    const patientContextJson = formData.get('patientContext') as string;
+    const medicalHistory = formData.get('medicalHistory') as string;
 
     const conversationHistory: Message[] = JSON.parse(conversationHistoryJson || '[]');
-    const personaContext = JSON.parse(personaContextJson || '{}');
+    const patientContext = JSON.parse(patientContextJson || '{}');
 
     if (!audioBlob) {
       return NextResponse.json({ error: 'Missing audio blob' }, { status: 400 });
@@ -100,14 +103,22 @@ export async function POST(req: NextRequest) {
 
     const newHistory: Message[] = [...conversationHistory, { role: 'user', text: transcript, id: `user-${Date.now()}`, timestamp: Date.now() }];
 
-    // Step 2: Logic with Gemini
+    // Step 2: Logic with Gemini (Updated System Prompt)
     const logicPrompt = `
-      You are a medical triage AI. Your role is to determine if you have enough information to make a diagnosis recommendation.
-      The user is describing their symptoms. You are speaking with a patient as a ${personaContext.name}, a specialist in ${personaContext.specialty}.
+      You are TriageX, an AI medical triage assistant.
+      You are speaking with ${patientContext.name} (Age: ${patientContext.age}).
+      
+      *** MEDICAL HISTORY (FHIR) ***
+      ${medicalHistory}
+      ******************************
+
+      Determine if their current symptoms are related to their history.
+      Your goal is to gather enough information to form a preliminary assessment.
+
       Conversation History:
       ${newHistory.map(msg => `${msg.role}: ${msg.text}`).join('\n')}
 
-      Analyze the complete conversation. Do you have sufficient information for a preliminary diagnosis?
+      Analyze the complete conversation. Do you have sufficient information for a preliminary diagnosis/triage?
       A minimum of one back-and-forth exchange is required.
       - If YES, and the conversation has had at least one user message and one assistant response, respond with a JSON object: {"status": "complete"}
       - If NO, generate a concise, clarifying follow-up question to gather more information. Respond with a JSON object: {"status": "continue", "text": "Your follow-up question here."}

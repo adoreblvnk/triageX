@@ -1,9 +1,10 @@
-export interface Persona {
+export interface PatientProfile {
   id: string;
   name: string;
-  title: string;
-  specialty: string;
-  avatar: string; // URL or path to image
+  age: number;
+  nric: string; // Masked NRIC
+  avatar?: string;
+  chronicConditions: string[]; // e.g., ["Hypertension", "Type 2 Diabetes"]
 }
 
 export interface Message {
@@ -23,7 +24,8 @@ export interface TriageTicket {
 export interface TriageState {
   status: 'idle' | 'recording' | 'processing' | 'speaking' | 'analyzing' | 'complete';
   conversation: Message[];
-  selectedPersona: Persona | null;
+  selectedPatient: PatientProfile | null;
+  medicalHistory: string; // Context string fetched from FHIR
   triageTicket: TriageTicket | null;
 }
 
@@ -31,7 +33,8 @@ export interface TriageContextType extends TriageState {
   setConversation: (conversation: Message[]) => void;
   addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void;
   setStatus: (status: TriageState['status']) => void;
-  setSelectedPersona: (persona: Persona | null) => void;
+  setSelectedPatient: (patient: PatientProfile | null) => void;
+  setMedicalHistory: (history: string) => void;
   playAudio: (audioBase64: string) => void;
   resetTriage: () => void;
   setTriageTicket: (ticket: TriageTicket | null) => void;
