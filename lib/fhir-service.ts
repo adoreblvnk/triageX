@@ -187,6 +187,7 @@ export async function seedDatabase() {
     } catch (error) {
         console.warn('FHIR Service: Docker not reachable or error during seed.');
         // We continue to try other bundles or exit; here we just log.
+        // NOTE: Important: Vercel does not support Docker, so we will always fallback to mock data there.
     }
   }
   console.log('FHIR Service: Seed process complete.');
