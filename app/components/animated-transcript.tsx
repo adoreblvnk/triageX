@@ -36,10 +36,10 @@ export function AnimatedTranscript({ text }: AnimatedTranscriptProps) {
   }, [words]);
 
   return (
-    <div className="text-center h-48 flex items-center justify-center">
-      <p className="text-3xl text-zinc-100 font-medium leading-relaxed">
+    <div className="text-center w-full max-w-3xl mx-auto px-4">
+      <p className="text-base text-zinc-100 font-medium leading-relaxed">
         {displayedText}
-        <span className="animate-pulse">|</span>
+        <span className="animate-pulse text-red-500">|</span>
       </p>
     </div>
   );

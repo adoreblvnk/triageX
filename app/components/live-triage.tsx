@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 const AudioWaveform = () => {
   return (
-    <div className="flex items-center justify-center space-x-1 h-12">
+    <div className="flex items-center justify-center space-x-1 h-12 shrink-0">
       {[...Array(20)].map((_, i) => (
         <div
           key={i}
@@ -64,7 +64,6 @@ export function LiveTriage() {
     }
   };
 
-  // Toggle function for Click-to-Record logic
   const toggleRecording = () => {
     if (status === 'recording') {
       stopRecording();
@@ -150,7 +149,6 @@ export function LiveTriage() {
       case 'recording':
         return (
           <div className="flex flex-col items-center justify-center h-48">
-             {/* Visual feedback for recording state */}
             <div className="w-24 h-24 bg-red-600 rounded-full animate-pulse shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
             <p className="mt-4 text-zinc-400 font-medium">Listening...</p>
           </div>
@@ -160,7 +158,8 @@ export function LiveTriage() {
         return <ProcessingHUD status={status} />;
       case 'speaking':
         return (
-            <div className="flex flex-col items-center justify-center h-48 w-full">
+            // UPDATED: Changed height logic and added gap to fix overflow
+            <div className="flex flex-col items-center justify-center min-h-[250px] w-full gap-8 py-8">
                 <AnimatedTranscript text={aiSpeakingText} />
                 <AudioWaveform />
             </div>
@@ -189,7 +188,6 @@ export function LiveTriage() {
           )
       }
 
-      // Updated Button Logic: Toggle on Click
       return (
         <div className="flex flex-col items-center gap-4">
             <button
