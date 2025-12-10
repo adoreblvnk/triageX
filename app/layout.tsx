@@ -4,6 +4,7 @@ import { Fira_Code } from "next/font/google";
 import "./globals.css";
 import { TriageProvider } from "@/app/providers/triage-provider";
 import { cn } from "@/lib/utils";
+import { Navbar } from "@/app/components/navbar";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
           firaCode.variable
         )}
       >
+        <Navbar />
         <TriageProvider>
             {children}
         </TriageProvider>

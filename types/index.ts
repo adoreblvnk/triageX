@@ -14,11 +14,19 @@ export interface Message {
   timestamp: number;
 }
 
-export interface TriageTicket {
-  urgency: 'critical' | 'high' | 'medium' | 'low';
-  specialty: string;
+export interface ModelOpinion {
+  model: string;
+  acuity: string;
   reasoning: string;
-  suggestedActions: string[];
+}
+
+export interface TriageTicket {
+  acuity_score: 'P1' | 'P2' | 'P3' | 'P4';
+  specialty: string;
+  reasoning: string; // The consolidated reasoning
+  suggestedActions: string[]; // Restored suggested actions
+  clinical_handoff_notes: string[];
+  model_consensus: ModelOpinion[]; // To show individual model votes
 }
 
 export interface TriageState {
