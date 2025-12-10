@@ -13,13 +13,43 @@ const firaCode = Fira_Code({
 });
 
 export const metadata: Metadata = {
+  // 1. Set the base URL for relative links (like images) to work
+  metadataBase: new URL("https://triagex.vercel.app"), 
+
   title: "TriageX",
   description: "Multi-AI Medical Triage System",
-  // ADDED: Explicitly set the icon here
+  
+  // Icons
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
     apple: "/icon.png",
+  },
+
+  // 2. Open Graph (Facebook, LinkedIn, WhatsApp, etc.)
+  openGraph: {
+    title: "TriageX",
+    description: "Autonomous AI Medical Pre-Triage Kiosk",
+    url: "https://triagex.vercel.app",
+    siteName: "TriageX",
+    images: [
+      {
+        url: "/homepage.png", // Points to public/homepage.png
+        width: 1200,
+        height: 630,
+        alt: "TriageX Interface",
+      },
+    ],
+    locale: "en_SG",
+    type: "website",
+  },
+
+  // 3. Twitter Card
+  twitter: {
+    card: "summary_large_image",
+    title: "TriageX",
+    description: "Autonomous AI Medical Pre-Triage Kiosk",
+    images: ["/homepage.png"], // Points to public/homepage.png
   },
 };
 
