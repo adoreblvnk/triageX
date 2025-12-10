@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   // 2. Open Graph (Facebook, LinkedIn, WhatsApp, etc.)
   openGraph: {
     title: "TriageX",
-    description: "Autonomous AI Medical Pre-Triage Kiosk",
+    description: "Multi-Agentic Medical Pre-Triage Kiosk",
     url: "https://triagex.vercel.app",
     siteName: "TriageX",
     images: [
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TriageX",
-    description: "Autonomous AI Medical Pre-Triage Kiosk",
+    description: "Multi-Agentic AI Medical Pre-Triage Kiosk",
     images: ["/homepage.png"], // Points to public/homepage.png
   },
 };
