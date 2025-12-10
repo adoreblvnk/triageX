@@ -17,7 +17,8 @@ import {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-black pt-24 pb-12 px-6 md:px-12 lg:px-24 text-zinc-100 font-sans">
+    // UPDATED: Removed min-h-screen, added flex-1
+    <main className="flex-1 bg-black pt-24 pb-12 px-6 md:px-12 lg:px-24 text-zinc-100 font-sans w-full">
       <div className="max-w-5xl mx-auto space-y-24">
         
         {/* 1. Hero: Hackathon Context */}
@@ -167,9 +168,9 @@ export default function AboutPage() {
                     <Network className="w-4 h-4" /> AI Ensemble
                 </div>
                 <ul className="text-xs text-zinc-400 space-y-1 font-mono">
-                    <li><a href="https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 hover:underline transition-colors">Google Gemini 2.5</a></li>
-                    <li><a href="https://ai-sdk.dev/providers/ai-sdk-providers/groq" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 hover:underline transition-colors">GPT-OSS (Groq)</a></li>
-                    <li><a href="https://ai-sdk.dev/providers/ai-sdk-providers/groq" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 hover:underline transition-colors">Llama 4 (Groq)</a></li>
+                    <li><a href="https://deepmind.google/technologies/gemini/" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 hover:underline transition-colors">Google Gemini 2.5</a></li>
+                    <li><a href="https://groq.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 hover:underline transition-colors">GPT-OSS (Groq)</a></li>
+                    <li><a href="https://www.llama.com" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 hover:underline transition-colors">Llama 4 (Groq)</a></li>
                 </ul>
              </div>
 
@@ -178,19 +179,20 @@ export default function AboutPage() {
                     <Mic className="w-4 h-4" /> Voice Logic
                 </div>
                 <ul className="text-xs text-zinc-400 space-y-1 font-mono">
-                    <li><a href="https://ai-sdk.dev/providers/ai-sdk-providers/elevenlabs" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 hover:underline transition-colors">ElevenLabs Scribe v1</a></li>
-                    <li><a href="https://elevenlabs.io/blog/eleven-multilingual-v2" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 hover:underline transition-colors">Eleven Multilingual v2</a></li>
+                    <li><a href="https://elevenlabs.io/speech-to-text" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 hover:underline transition-colors">ElevenLabs Scribe v1</a></li>
+                    <li><a href="https://elevenlabs.io/text-to-speech" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 hover:underline transition-colors">Eleven Multilingual v2</a></li>
                     <li>Audio Isolation Engine</li>
                 </ul>
              </div>
 
              <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
                 <div className="flex items-center gap-2 mb-2 text-orange-400 font-bold text-sm">
-                    <Database className="w-4 h-4" /> FHIR Docker Server over H2 Database
+                    <Database className="w-4 h-4" /> Smart Nation
                 </div>
                 <ul className="text-xs text-zinc-400 space-y-1 font-mono">
-                    <li><a href="https://github.com/hapifhir/hapi-fhir-jpaserver-starter" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 hover:underline transition-colors">HAPI FHIR Server over H2 Database</a></li>
+                    <li><a href="https://hapifhir.io" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 hover:underline transition-colors">HAPI FHIR Server</a></li>
                     <li><a href="https://hl7.org/fhir" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 hover:underline transition-colors">HL7 Interoperability</a></li>
+                    <li>Docker Container</li>
                 </ul>
              </div>
           </div>

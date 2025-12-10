@@ -36,7 +36,9 @@ function TriageApp() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-black text-zinc-100 p-8">
+    // UPDATED: Changed min-h-screen to flex-1 to allow footer to stick to bottom
+    // Added pt-24 to clear the fixed navbar
+    <main className="flex flex-1 flex-col items-center justify-center bg-black text-zinc-100 p-8 pt-24 w-full">
       <div className="w-full max-w-4xl text-center">
         <h1 className="text-5xl font-bold tracking-tighter mb-2">TriageX</h1>
         <p className="text-zinc-400 mb-12">Voice-First Accelerated Medical Triage</p>
