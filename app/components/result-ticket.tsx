@@ -1,11 +1,32 @@
 'use client';
 
 import { useTriage } from "@/app/providers/triage-provider";
-import { Printer, CheckCircle2, Info } from "lucide-react";
+import { Printer, CheckCircle2, Info, ScanLine, ArrowRight } from "lucide-react";
+import { AcuityVisualizer } from "./acuity-visualizer";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export function ResultTicket() {
     const { triageTicket, selectedPatient } = useTriage();
+    const [keywords, setKeywords] = useState<string[]>([]);
+    const [isScanning, setIsScanning] = useState(false);
     
+    useEffect(() => {
+        if (triageTicket?.reasoning) {
+            setIsScanning(true);
+            fetch('/api/highlight', {
+                method: 'POST',
+                body: JSON.stringify({ text: triageTicket.reasoning })
+            })
+            .then(res => res.json())
+            .then(data => {
+                setKeywords(data.keywords || []);
+                setIsScanning(false);
+            })
+            .catch(() => setIsScanning(false));
+        }
+    }, [triageTicket]);
+
     if (!triageTicket || !selectedPatient) return null;
 
     const handlePrint = () => {
@@ -17,44 +38,38 @@ export function ResultTicket() {
         hour: '2-digit', minute: '2-digit', hour12: false
     }).replace(',', '');
 
+    const renderReasoning = () => {
+        const fullText = triageTicket.reasoning;
+        const paragraphs = fullText.split('\n\n');
+
+        return paragraphs.map((paragraph, pIdx) => {
+            if (keywords.length === 0) {
+                return <p key={pIdx} className="mb-2 last:mb-0">{paragraph}</p>;
+            }
+            
+            const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\\]/g, '\\{new_string}'));
+            escapedKeywords.sort((a, b) => b.length - a.length);
+            
+            const regex = new RegExp(`(${escapedKeywords.join('|')})`, 'gi');
+            const parts = paragraph.split(regex);
+            
+            const highlightedParagraph = parts.map((part, i) => {
+                const isMatch = keywords.some(k => k.toLowerCase() === part.toLowerCase());
+                return isMatch 
+                    ? <mark key={i} className="bg-yellow-200/50 font-bold px-0.5 rounded-sm">{part}</mark>
+                    : part;
+            });
+
+            return <p key={pIdx} className="mb-2 last:mb-0">{highlightedParagraph}</p>;
+        });
+    };
+
     return (
         <div className="w-full max-w-md mx-auto animate-fade-in pb-12">
-            {/* Acuity Explanation Section */}
-            <div className="bg-zinc-800 text-zinc-200 p-4 rounded-t-lg mb-4 shadow-lg">
-                <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-                    <Info className="w-5 h-5 text-blue-400" />
-                    Understanding Your Acuity Score
-                </h3>
-                <p className="text-sm mb-3">Your TriageX Acuity Score helps polyclinic staff prioritize care. Here's what it means:</p>
-                <ul className="text-sm space-y-2">
-                    <li>
-                        <span className="font-bold text-red-400">P1 (Critical):</span> Immediate, life-threatening condition. You need to be seen by staff now.
-                    </li>
-                    <li>
-                        <span className="font-bold text-orange-400">P2 (Major Emergency):</span> Severe symptoms, but stable. A short wait is anticipated.
-                    </li>
-                    <li>
-                        <span className="font-bold text-yellow-400">P3 (Minor Emergency):</span> Acute but stable condition. Standard wait times apply.
-                    </li>
-                    <li>
-                        <span className="font-bold text-green-400">P4 (Non-Emergency):</span> Suitable for general practitioner or pharmacy. Longest wait times expected.
-                    </li>
-                </ul>
-                <p className="text-xs text-zinc-400 mt-3">Please show this slip to the triage nurse.</p>
-            </div>
-
-            {/* Ticket Container - ROTATION REMOVED */}
-            <div className="bg-white text-black font-mono p-6 relative shadow-xl filter drop-shadow-lg">
+            
+            {/* Ticket Container */}
+            <div className="bg-white text-black font-mono p-6 relative shadow-xl filter drop-shadow-lg transform transition-all hover:scale-[1.01]">
                 
-                {/* Jagged Top (Hidden as per previous code, but keeping for consistency) */}
-                <div 
-                    className="absolute -top-2 left-0 right-0 h-4 bg-white"
-                    style={{ 
-                        clipPath: 'polygon(0% 100%, 2% 0%, 4% 100%, 6% 0%, 8% 100%, 10% 0%, 12% 100%, 14% 0%, 16% 100%, 18% 0%, 20% 100%, 22% 0%, 24% 100%, 26% 0%, 28% 100%, 30% 0%, 32% 100%, 34% 0%, 36% 100%, 38% 0%, 40% 100%, 42% 0%, 44% 100%, 46% 0%, 48% 100%, 50% 0%, 52% 100%, 54% 0%, 56% 100%, 58% 0%, 60% 100%, 62% 0%, 64% 100%, 66% 0%, 68% 100%, 70% 0%, 72% 100%, 74% 0%, 76% 100%, 78% 0%, 80% 100%, 82% 100%, 84% 0%, 86% 100%, 88% 0%, 90% 100%, 92% 0%, 94% 100%, 96% 0%, 98% 100%, 100% 100%)',
-                        display: 'none'
-                    }} 
-                />
-
                 {/* Header */}
                 <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
                     <h2 className="font-bold text-lg leading-tight">SINGAPORE HEALTH SERVICES</h2>
@@ -76,9 +91,12 @@ export function ResultTicket() {
                 </div>
 
                 {/* Acuity Score */}
-                <div className="text-center border-2 border-black p-4 mb-6">
+                <div className="text-center border-2 border-black p-4 mb-6 relative overflow-hidden">
                     <p className="text-sm font-bold uppercase mb-1">Final Acuity Score</p>
-                    <div className="text-6xl font-black tracking-tighter">
+                    <div className={`text-6xl font-black tracking-tighter ${ triageTicket.acuity_score === 'P1' ? 'text-red-600' :
+                        triageTicket.acuity_score === 'P2' ? 'text-orange-600' :
+                        triageTicket.acuity_score === 'P3' ? 'text-yellow-600' : 'text-green-600'
+                    }`}>
                         {triageTicket.acuity_score}
                     </div>
                     <p className="text-xs mt-1 uppercase font-bold">
@@ -89,25 +107,28 @@ export function ResultTicket() {
                     </p>
                 </div>
 
-                {/* AI Verification Log */}
-                <div className="mb-6 bg-zinc-100 p-3 border border-zinc-300">
-                    <p className="text-xs font-bold uppercase border-b border-zinc-400 mb-2 pb-1 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        AI Consensus Log
-                    </p>
-                    <div className="space-y-2 text-xs">
-                        {triageTicket.model_consensus.map((opinion, idx) => (
-                            <div key={idx} className="flex justify-between items-start gap-2">
-                                <span className="font-bold min-w-[80px]">{opinion.model}:</span>
-                                <div className="text-right">
-                                    <span className="font-bold bg-black text-white px-1 mr-1">{opinion.acuity}</span>
-                                    <span className="text-zinc-600 italic block mt-0.5 leading-tight text-[10px]">
-                                        "{opinion.reasoning}"
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                {/* Clinical Reasoning (Progressive Highlight) */}
+                <div className="mb-6 relative">
+                     <p className="text-xs font-bold uppercase border-b border-black mb-2">Clinical Assessment</p>
+                     <div className="text-sm leading-relaxed relative">
+                        {renderReasoning()}
+                        
+                        {/* Scanning Effect */}
+                        {isScanning && (
+                            <motion.div 
+                                className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-200/20 to-transparent pointer-events-none"
+                                initial={{ x: '-100%' }}
+                                animate={{ x: '100%' }}
+                                transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                            />
+                        )}
+                     </div>
+                     {isScanning && (
+                         <div className="flex items-center gap-1 mt-1 text-[10px] text-zinc-500 uppercase tracking-wider">
+                             <ScanLine className="w-3 h-3 animate-spin" />
+                             Scanning medical entities...
+                         </div>
+                     )}
                 </div>
 
                 {/* Suggested Actions */}
@@ -117,7 +138,7 @@ export function ResultTicket() {
                         <ul className="text-sm space-y-1 font-bold">
                             {triageTicket.suggestedActions.map((action, i) => (
                                 <li key={i} className="leading-tight flex items-start gap-2">
-                                    <span>•</span>
+                                    <ArrowRight className="w-3 h-3 mt-0.5 shrink-0" />
                                     <span>{action}</span>
                                 </li>
                             ))}
@@ -125,8 +146,8 @@ export function ResultTicket() {
                     </div>
                 )}
 
-                {/* Doctor's Notes */}
-                <div className="mb-6">
+                 {/* Doctor's Notes */}
+                 <div className="mb-6">
                     <p className="text-xs font-bold uppercase border-b border-black mb-2">Doctor's Handoff Notes</p>
                     <ul className="text-xs space-y-1 font-medium text-zinc-800">
                         {triageTicket.clinical_handoff_notes.map((note, i) => (
@@ -156,11 +177,37 @@ export function ResultTicket() {
             {/* Print Button */}
             <button 
                 onClick={handlePrint}
-                className="mt-8 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition-colors print:hidden shadow-lg"
+                className="mt-8 w-full bg-zinc-100 hover:bg-white text-black border border-black font-bold py-3 px-6 flex items-center justify-center gap-2 transition-colors print:hidden shadow-sm"
             >
                 <Printer className="w-5 h-5" />
                 PRINT TICKET
             </button>
+
+             {/* Algorithm Visualizer (New) */}
+            <AcuityVisualizer log={triageTicket.calculation_log} finalAcuity={triageTicket.acuity_score} />
+
+             {/* Acuity Legend */}
+             <div className="bg-zinc-900 border border-zinc-800 text-zinc-400 p-4 rounded-lg mt-6 shadow-lg">
+                <h3 className="text-xs font-bold mb-3 uppercase text-zinc-500">Legend</h3>
+                <ul className="text-xs space-y-2 font-mono">
+                    <li className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                        <span className="text-zinc-300">P1: Critical/Life Threatening</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                        <span className="text-zinc-300">P2: Major Emergency</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                        <span className="text-zinc-300">P3: Minor Emergency</span>
+                    </li>
+                     <li className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span className="text-zinc-300">P4: Non-Emergency</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     );
 }

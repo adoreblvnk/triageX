@@ -2,13 +2,13 @@
 
 import { useState, useRef } from 'react';
 import { useTriage } from '@/app/providers/triage-provider';
-import { Mic, Square, LoaderCircle } from 'lucide-react';
+import { Mic, Square } from 'lucide-react';
 import { ResultTicket } from './result-ticket';
 import { AnimatedTranscript } from './animated-transcript';
+import { ProcessingHUD } from './processing-hud';
 import Image from 'next/image';
 
 const AudioWaveform = () => {
-  // A simple placeholder for a waveform visualization
   return (
     <div className="flex items-center justify-center space-x-1 h-12">
       {[...Array(20)].map((_, i) => (
@@ -61,6 +61,15 @@ export function LiveTriage() {
   const stopRecording = () => {
     if (mediaRecorderRef.current && status === 'recording') {
       mediaRecorderRef.current.stop();
+    }
+  };
+
+  // Toggle function for Click-to-Record logic
+  const toggleRecording = () => {
+    if (status === 'recording') {
+      stopRecording();
+    } else {
+      startRecording();
     }
   };
 
@@ -141,18 +150,14 @@ export function LiveTriage() {
       case 'recording':
         return (
           <div className="flex flex-col items-center justify-center h-48">
-            <div className="w-24 h-24 bg-red-600 rounded-full animate-pulse" />
-            <p className="mt-4 text-zinc-400">Listening...</p>
+             {/* Visual feedback for recording state */}
+            <div className="w-24 h-24 bg-red-600 rounded-full animate-pulse shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
+            <p className="mt-4 text-zinc-400 font-medium">Listening...</p>
           </div>
         );
       case 'processing':
       case 'analyzing':
-        return (
-          <div className="flex flex-col items-center justify-center h-48">
-            <LoaderCircle className="w-24 h-24 text-zinc-500 animate-spin" />
-            <p className="mt-4 text-zinc-400">{status === 'analyzing' ? 'Analyzing...' : 'Processing...'}</p>
-          </div>
-        );
+        return <ProcessingHUD status={status} />;
       case 'speaking':
         return (
             <div className="flex flex-col items-center justify-center h-48 w-full">
@@ -166,7 +171,7 @@ export function LiveTriage() {
       default:
         return (
             <div className="flex flex-col items-center justify-center h-48">
-                 <p className="text-zinc-300 mb-4">Press the button and describe your symptoms.</p>
+                 <p className="text-zinc-300 mb-4">Tap the mic to describe your symptoms.</p>
             </div>
         )
     }
@@ -177,34 +182,42 @@ export function LiveTriage() {
           return (
             <button
                 onClick={resetTriage}
-                className="bg-white text-black font-bold py-4 px-8 border border-zinc-800"
+                className="bg-white text-black font-bold py-4 px-8 border border-zinc-800 rounded hover:bg-zinc-200 transition-colors"
             >
                 Start New Triage
             </button>
           )
       }
 
+      // Updated Button Logic: Toggle on Click
       return (
-        <button
-            onMouseDown={startRecording}
-            onMouseUp={stopRecording}
-            onTouchStart={startRecording}
-            onTouchEnd={stopRecording}
-            className={`w-24 h-24 flex items-center justify-center rounded-full border-2 transition-colors duration-200 ${
-                status === 'recording' ? 'bg-red-600 border-red-400' : 'bg-white border-zinc-800'
-            }`}
-        >
-            {status === 'recording' ? (
-                <Square className="w-10 h-10 text-white" />
-            ) : (
-                <Mic className="w-10 h-10 text-black" />
-            )}
-        </button>
+        <div className="flex flex-col items-center gap-4">
+            <button
+                onClick={toggleRecording}
+                disabled={status === 'processing' || status === 'analyzing' || status === 'speaking'}
+                className={`w-24 h-24 flex items-center justify-center rounded-full border-2 transition-all duration-300 ${
+                    status === 'recording' 
+                        ? 'bg-red-600 border-red-500 scale-110 shadow-[0_0_20px_rgba(220,38,38,0.5)]' 
+                        : 'bg-white border-zinc-800 hover:scale-105'
+                } ${
+                    (status === 'processing' || status === 'analyzing' || status === 'speaking') ? 'opacity-50 cursor-not-allowed grayscale' : ''
+                }`}
+            >
+                {status === 'recording' ? (
+                    <Square className="w-8 h-8 text-white fill-current animate-pulse" />
+                ) : (
+                    <Mic className="w-10 h-10 text-black" />
+                )}
+            </button>
+            <p className="text-sm text-zinc-500 font-medium animate-fade-in uppercase tracking-wider">
+                {status === 'recording' ? 'Tap to Stop' : 'Tap to Speak'}
+            </p>
+        </div>
       )
   }
 
   return (
-    <div className="w-full border border-zinc-800 bg-black p-8 flex flex-col items-center">
+    <div className="w-full border border-zinc-800 bg-black p-8 flex flex-col items-center rounded-xl">
         <div className="w-full text-left mb-4 flex justify-between items-end">
             <div className="flex items-center gap-4">
                 {selectedPatient?.avatar && (

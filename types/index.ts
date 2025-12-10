@@ -27,6 +27,11 @@ export interface TriageTicket {
   suggestedActions: string[]; // Restored suggested actions
   clinical_handoff_notes: string[];
   model_consensus: ModelOpinion[]; // To show individual model votes
+  calculation_log?: {
+    method: string;
+    votes: { model: string; weight: number; acuity: string }[];
+    final_score: number;
+  };
 }
 
 export interface TriageState {

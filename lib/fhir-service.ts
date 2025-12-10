@@ -5,7 +5,7 @@ const FHIR_BASE_URL = 'http://localhost:8080/fhir';
 // Static Fallback Data (used if Docker is down)
 const MOCK_RECORDS: Record<string, string> = {
   'patient-001': `
-    Patient: Uncle Tan (68M)
+    Patient: Steven Tan (68M)
     Conditions: Hypertension (diagnosed 2018), Hyperlipidemia (diagnosed 2019)
     Medications: Amlodipine 5mg (Daily), Atorvastatin 20mg (Nightly)
     Allergies: Penicillin (Mild Rash)
@@ -29,7 +29,7 @@ const MOCK_RECORDS: Record<string, string> = {
 
 // Seed Data Bundles
 const SEED_BUNDLES = [
-  // Uncle Tan
+  // Steven Tan
   {
     resourceType: 'Bundle',
     type: 'transaction',
@@ -38,7 +38,7 @@ const SEED_BUNDLES = [
         resource: {
           resourceType: 'Patient',
           id: 'patient-001',
-          name: [{ family: 'Tan', given: ['Uncle'] }],
+          name: [{ family: 'Tan', given: ['Steven'] }],
           gender: 'male',
           birthDate: '1955-06-15',
         },
@@ -168,16 +168,11 @@ export async function seedDatabase() {
   
   for (const bundle of SEED_BUNDLES) {
     try {
-        // Extract the Patient resource to find the ID for logging
         const patientEntry = bundle.entry.find(e => e.resource.resourceType === 'Patient');
         const patientId = patientEntry?.resource.id || 'unknown';
 
         console.log(`FHIR Service: Seeding ${patientId}...`);
         
-        // We skip the existence check and directly POST the transaction.
-        // The Patient entry uses PUT (update/create), so it is idempotent.
-        // The Condition/Medication entries use POST, which might create duplicates if run repeatedly 
-        // without a clean slate, but this ensures the Patient resource definitely exists.
         await fetch(FHIR_BASE_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/fhir+json' },
@@ -186,15 +181,12 @@ export async function seedDatabase() {
         
     } catch (error) {
         console.warn('FHIR Service: Docker not reachable or error during seed.');
-        // We continue to try other bundles or exit; here we just log.
-        // NOTE: Important: Vercel does not support Docker, so we will always fallback to mock data there.
     }
   }
   console.log('FHIR Service: Seed process complete.');
 }
 
 export async function getPatientRecord(patientId: string): Promise<string> {
-  // 1. Try to fetch from local FHIR server
   try {
     const patientRes = await fetch(`${FHIR_BASE_URL}/Patient/${patientId}`);
     if (!patientRes.ok) throw new Error('Patient not found');
@@ -206,7 +198,6 @@ export async function getPatientRecord(patientId: string): Promise<string> {
     const medsRes = await fetch(`${FHIR_BASE_URL}/MedicationRequest?subject=Patient/${patientId}`);
     const medsData = await medsRes.json();
 
-    // Format the data into a readable string
     const name = patientData.name?.[0]?.given?.join(' ') + ' ' + patientData.name?.[0]?.family;
     const gender = patientData.gender;
     const birthDate = patientData.birthDate;
@@ -229,7 +220,6 @@ export async function getPatientRecord(patientId: string): Promise<string> {
     `;
 
   } catch (error) {
-    // 2. Fallback to Mock Data
     console.warn(`FHIR Service: Fetch failed for ${patientId}. Using fallback.`);
     return MOCK_RECORDS[patientId] || 'No records found.';
   }

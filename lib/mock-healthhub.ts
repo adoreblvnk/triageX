@@ -3,11 +3,11 @@ import { PatientProfile } from '@/types';
 export const mockPatients: PatientProfile[] = [
   {
     id: 'patient-001',
-    name: 'Uncle Tan',
+    name: 'Steven Tan',
     age: 68,
     nric: 'S****123A',
     chronicConditions: ['Hypertension', 'Hyperlipidemia'],
-    avatar: '/avatars/uncle-tan.png',
+    avatar: '/avatars/uncle-tan.png', // Keeping filename same if image file exists, or rename file if needed
   },
   {
     id: 'patient-002',

@@ -22,7 +22,7 @@ export function Navbar() {
           href="/about" 
           className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
         >
-          Mission & Tech
+          About
         </Link>
       </div>
     </nav>
