@@ -5,6 +5,7 @@ import { useTriage } from '@/app/providers/triage-provider';
 import { Mic, Square, LoaderCircle } from 'lucide-react';
 import { ResultTicket } from './result-ticket';
 import { AnimatedTranscript } from './animated-transcript';
+import Image from 'next/image';
 
 const AudioWaveform = () => {
   // A simple placeholder for a waveform visualization
@@ -205,13 +206,25 @@ export function LiveTriage() {
   return (
     <div className="w-full border border-zinc-800 bg-black p-8 flex flex-col items-center">
         <div className="w-full text-left mb-4 flex justify-between items-end">
-            <div>
-                <p className="text-zinc-400 text-sm">Patient Profile:</p>
-                <h2 className="text-2xl font-bold">{selectedPatient?.name}</h2>
-                <div className="flex items-center gap-2 text-sm text-zinc-500">
-                    <span>{selectedPatient?.age} y/o</span>
-                    <span>•</span>
-                    <span>{selectedPatient?.nric}</span>
+            <div className="flex items-center gap-4">
+                {selectedPatient?.avatar && (
+                    <div className="relative w-12 h-12 shrink-0">
+                        <Image
+                            src={selectedPatient.avatar}
+                            alt={selectedPatient.name}
+                            fill
+                            className="rounded-full object-cover border border-zinc-700"
+                        />
+                    </div>
+                )}
+                <div>
+                    <p className="text-zinc-400 text-sm">Patient Profile:</p>
+                    <h2 className="text-2xl font-bold">{selectedPatient?.name}</h2>
+                    <div className="flex items-center gap-2 text-sm text-zinc-500">
+                        <span>{selectedPatient?.age} y/o</span>
+                        <span>•</span>
+                        <span>{selectedPatient?.nric}</span>
+                    </div>
                 </div>
             </div>
             {medicalHistory && (

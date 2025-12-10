@@ -4,6 +4,7 @@ import { mockPatients } from '@/lib/mock-healthhub';
 import { useTriage } from '@/app/providers/triage-provider';
 import { PatientProfile } from '@/types';
 import { ChevronRight, User, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 
 export function PersonaGrid({ onSelect }: { onSelect?: (patient: PatientProfile) => void }) {
   const { setSelectedPatient } = useTriage();
@@ -29,14 +30,32 @@ export function PersonaGrid({ onSelect }: { onSelect?: (patient: PatientProfile)
           <button
             key={patient.id}
             onClick={() => handleSelect(patient)}
-            className={`p-6 text-left hover:bg-zinc-900 transition-colors duration-200 flex justify-between items-start group
+            className={`p-6 text-left hover:bg-zinc-900 transition-colors duration-200 flex items-start group gap-4
               ${index >= 2 ? 'border-t md:border-t-0' : ''} 
             `}
           >
-            <div className="flex-1">
+            {/* Image Column (Left) */}
+            <div className="shrink-0 relative">
+               {patient.avatar ? (
+                 <Image
+                   src={patient.avatar}
+                   alt={patient.name}
+                   width={96}
+                   height={96}
+                   className="w-24 h-24 rounded-md object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-300"
+                 />
+               ) : (
+                 <div className="w-24 h-24 rounded-md bg-zinc-800 flex items-center justify-center">
+                   <User className="text-zinc-600" />
+                 </div>
+               )}
+            </div>
+
+            {/* Details Column (Right) */}
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-lg font-semibold group-hover:text-blue-400 transition-colors">{patient.name}</h3>
-                <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">
+                <h3 className="text-lg font-semibold group-hover:text-blue-400 transition-colors truncate">{patient.name}</h3>
+                <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">
                   {patient.age} y/o
                 </span>
               </div>
@@ -57,7 +76,8 @@ export function PersonaGrid({ onSelect }: { onSelect?: (patient: PatientProfile)
                 </div>
               )}
             </div>
-            <div className="flex h-full items-center pl-4">
+
+            <div className="flex h-full items-center pl-2">
                  <ChevronRight className="w-6 h-6 text-zinc-600 group-hover:text-zinc-300" />
             </div>
           </button>
