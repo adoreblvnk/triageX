@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   Code,
   Server,
-  Users
+  Users,
+  FileJson // Added icon for JSON/Structured Output
 } from "lucide-react";
 
 export default function AboutPage() {
@@ -135,18 +136,43 @@ export default function AboutPage() {
                 </div>
              </div>
 
-             <div className="mt-8 pt-6 border-t border-zinc-800">
-                <h4 className="text-sm font-bold text-zinc-300 mb-2 flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-red-500" />
-                    Safety-First Consensus Algorithm
-                </h4>
-                <p className="text-sm text-zinc-400 leading-relaxed max-w-2xl">
-                    Instead of relying on a single AI, we poll three state-of-the-art models via <strong>Vercel AI SDK</strong>. 
-                    <span className="block mt-2 font-mono text-xs bg-black/50 p-3 rounded border border-zinc-800 text-green-400">
-                        IF any_model_vote == "P1_CRITICAL" THEN final_score = "P1" (Safety Override)<br/>
-                        ELSE final_score = CEIL(AVG(weighted_votes))
-                    </span>
-                </p>
+             {/* Differentiators Grid: Safety & Structured Output */}
+             <div className="mt-8 pt-6 border-t border-zinc-800 grid md:grid-cols-2 gap-8 relative z-10">
+                
+                {/* Block 1: Consensus Algorithm */}
+                <div>
+                    <h4 className="text-sm font-bold text-zinc-300 mb-2 flex items-center gap-2">
+                        <ShieldAlert className="w-4 h-4 text-red-500" />
+                        Safety-First Consensus Algorithm
+                    </h4>
+                    <p className="text-sm text-zinc-400 leading-relaxed">
+                        We poll three state-of-the-art models via <strong>Vercel AI SDK</strong>. 
+                        We prioritize safety over averages.
+                    </p>
+                    <div className="mt-2 font-mono text-xs bg-black/50 p-3 rounded border border-zinc-800 text-green-400">
+                        IF any_model_vote == "P1_CRITICAL"<br/> 
+                        THEN final_score = "P1" (Override)<br/>
+                        ELSE final_score = CEIL(AVG(votes))
+                    </div>
+                </div>
+
+                {/* Block 2: Structured Output */}
+                <div>
+                    <h4 className="text-sm font-bold text-zinc-300 mb-2 flex items-center gap-2">
+                        <FileJson className="w-4 h-4 text-blue-500" />
+                        Structured Output Enforcement
+                    </h4>
+                    <p className="text-sm text-zinc-400 leading-relaxed">
+                        Unlike standard chatbots, TriageX is the only solution using <strong>Zod schema validation</strong> to enforce strict JSON outputs. This ensures data is 100% compatible with hospital databases.
+                    </p>
+                    <div className="mt-2 font-mono text-xs bg-black/50 p-3 rounded border border-zinc-800 text-blue-300">
+                        &#123;<br/>
+                        &nbsp;&nbsp;"acuity": "P2",<br/>
+                        &nbsp;&nbsp;"actions": ["RICE", "X-Ray"]<br/>
+                        &#125;
+                    </div>
+                </div>
+
              </div>
           </div>
 
@@ -157,7 +183,7 @@ export default function AboutPage() {
                     <Code className="w-4 h-4" /> Frontend
                 </div>
                 <ul className="text-xs text-zinc-400 space-y-1 font-mono">
-                    <li><a href="https://nextjs.org" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 hover:underline transition-colors">Next.js 14</a> & TypeScript</li>
+                    <li><a href="https://nextjs.org" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 hover:underline transition-colors">Next.js</a> & TypeScript</li>
                     <li><a href="https://tailwindcss.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 hover:underline transition-colors">Tailwind CSS</a></li>
                     <li><a href="https://motion.dev" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 hover:underline transition-colors">Framer Motion</a></li>
                 </ul>
