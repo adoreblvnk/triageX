@@ -86,6 +86,8 @@ TriageX operates on a sophisticated "Safety-First Weighted Consensus" algorithm.
 
 ## Demo
 
+<div align="center"><video width="750" controls src="https://github.com/user-attachments/assets/be72a139-dd78-4dd3-90dc-3324ea34a9d1"</video></div>
+
 ## Getting Started
 
 ### Prerequisites
