@@ -19,6 +19,9 @@
   <p>
     <b>By Team Participation Mark</b>
   </p>
+  <p>
+    Live Site: <a href="https://triagex.vercel.app">triagex.vercel.app</a>
+  </p>
 </div>
 
 ---
@@ -85,6 +88,8 @@ TriageX operates on a sophisticated "Safety-First Weighted Consensus" algorithm.
    - `ELSE` &rarr; Calculate weighted average of votes.
 
 ## Demo
+
+Try it live here: [triagex.vercel.app](https://triagex.vercel.app)
 
 <div align="center"><video width="750" controls src="https://github.com/user-attachments/assets/be72a139-dd78-4dd3-90dc-3324ea34a9d1"</video></div>
 
