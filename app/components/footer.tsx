@@ -27,7 +27,7 @@ export function Footer() {
                 className="flex items-center gap-1 text-zinc-400 hover:text-white underline decoration-zinc-800 underline-offset-4 transition-colors"
               >
                 <Github className="w-3 h-3" />
-                Source Code
+                Source Code (more stuff here)
               </a>
             </span>
           </div>

@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const { text } = await req.json();
 
-    if (!text) {
+    if (!text || !process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
         return NextResponse.json({ keywords: [] });
     }
   

@@ -6,13 +6,12 @@ import { experimental_transcribe as transcribe } from "ai";
 import { generateText } from "ai";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Message } from "@/types";
-import { Buffer } from "buffer"; // Explicitly import Buffer
-
-const elevenlabsClient = new ElevenLabsClient({
-  apiKey: process.env.ELEVENLABS_API_KEY,
-});
+import { Buffer } from "buffer";
 
 export const dynamic = "force-dynamic";
+
+// --- MOCK DATA FOR SUNSET MODE ---
+const MOCK_TRANSCRIPT_1 = "I was running for the bus and I fell. My ankle is very swollen and I can't put any weight on it. It hurts a lot.";
 
 async function* streamToAsyncIterable<T>(
   stream: ReadableStream<T>,
@@ -58,10 +57,29 @@ export async function POST(req: NextRequest) {
     const patientContextJson = formData.get("patientContext") as string;
     const medicalHistory = formData.get("medicalHistory") as string;
 
-    const conversationHistory: Message[] = JSON.parse(
-      conversationHistoryJson || "[]",
-    );
+    const conversationHistory: Message[] = JSON.parse(conversationHistoryJson || "[]");
     const patientContext = JSON.parse(patientContextJson || "{}");
+
+    // SUNSET MODE CHECK
+    // If API keys are missing, run the Simulation
+    if (!process.env.ELEVENLABS_API_KEY || !process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+        console.log("⚠️ API Keys missing. Running in Mockup/Sunset Mode.");
+
+        // Simulate Processing Delay (1.5s)
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // immediately return MOCK_TRANSCRIPT_1 and MOCK_REPLY_1 for first user message
+        return NextResponse.json({
+            transcript: MOCK_TRANSCRIPT_1,
+            aiResponseText: "",
+            aiAudioBase64: null,
+            status: "complete",
+        });
+    }
+
+    const elevenlabsClient = new ElevenLabsClient({
+        apiKey: process.env.ELEVENLABS_API_KEY,
+    });
 
     if (!audioBlob) {
       return NextResponse.json(
@@ -145,7 +163,7 @@ export async function POST(req: NextRequest) {
     const logicPrompt = `
       You are TriageX, an AI medical triage assistant.
       You are speaking with ${patientContext.name} (Age: ${patientContext.age}).
-      
+
       *** MEDICAL HISTORY (FHIR) ***
       ${medicalHistory}
       ******************************

@@ -15,6 +15,40 @@ const TriageSchema = z.object({
   clinical_handoff_notes: z.array(z.string())
 });
 
+// --- MOCK TICKET FOR SUNSET MODE ---
+const MOCK_TICKET = {
+  acuity_score: "P2",
+  specialty: "Orthopedics / Trauma",
+  reasoning: "Gemini 2.5 Flash: Patient presents with acute ankle injury with inability to bear weight, raising suspicion of fracture. \n\nGPT-OSS 120B: Symptoms consistent with severe sprain or fracture. Vitals stable but pain is significant.\n\nLlama 4 Maverick: Age (68) and history of hypertension increase risk profile. Inability to bear weight triggers Ottawa Ankle Rules for imaging.",
+  suggestedActions: [
+    "Perform Ottawa Ankle Rules assessment",
+    "Assess neurovascular status of right foot",
+    "Apply RICE protocol (Rest, Ice, Compression, Elevation)",
+    "Administer analgesia as needed"
+  ],
+  clinical_handoff_notes: [
+    "68M w/ Hx Hypertension & Hyperlipidemia",
+    "Acute right ankle injury post-fall while running",
+    "Patient reports inability to bear weight (Critical Marker)",
+    "Significant swelling observed; No open wound reported",
+    "Priority for X-Ray to rule out fracture"
+  ],
+  model_consensus: [
+    { model: "Gemini 2.5 Flash", acuity: "P2", reasoning: "Inability to bear weight suggests fracture risk." },
+    { model: "GPT-OSS 120B", acuity: "P3", reasoning: "Likely severe sprain, stable vitals." },
+    { model: "Llama 4 Maverick", acuity: "P2", reasoning: "High risk factor (Age 68) + Mobility loss." }
+  ],
+  calculation_log: {
+    method: "Weighted Consensus",
+    votes: [
+      { model: "Gemini 2.5 Flash", weight: 3, acuity: "P2" },
+      { model: "GPT-OSS 120B", weight: 2, acuity: "P3" },
+      { model: "Llama 4 Maverick", weight: 3, acuity: "P2" }
+    ],
+    final_score: 3
+  }
+};
+
 export async function POST(req: NextRequest) {
     try {
         const { conversationHistory, patientContext, medicalHistory } = await req.json();
@@ -23,11 +57,22 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing conversation history or patient context' }, { status: 400 });
         }
 
+        // SUNSET MODE CHECK
+        // If API keys are missing, return the Mock Ticket
+        if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY || !process.env.GROQ_API_KEY) {
+            console.log("⚠️ API Keys missing. Returning Mock Triage Ticket.");
+
+            // Simulate Analysis Delay (2.5s) to let the HUD animation play
+            await new Promise(resolve => setTimeout(resolve, 2500));
+
+            return NextResponse.json(MOCK_TICKET);
+        }
+
         const analysisPrompt = `
             CONTEXT: The user is a patient CURRENTLY ONSITE at a Singapore Polyclinic.
-            
+
             YOUR ROLE: Act as an advanced clinical triage AI.
-            
+
             TASK:
             1. Assign a PAC (Patient Acuity Category) Score: P1 (Critical), P2 (Major Emergency), P3 (Minor Emergency), P4 (Non-Emergency).
             2. Suggest immediate actions (Suggested Actions).
@@ -74,10 +119,10 @@ export async function POST(req: NextRequest) {
         // Voting Logic (Safety-First Consensus)
         const acuityWeights = { "P1": 4, "P2": 3, "P3": 2, "P4": 1, "N/A": 0 };
         const validResults = [geminiResult, gptResult, llamaResult].filter(r => r && r.acuity_score);
-        
+
         // 1. Safety Override Check
         const criticalVote = validResults.find(r => r?.acuity_score === 'P1');
-        
+
         let finalAcuity = 'P3';
         let consensusMethod = 'Standard Weighted Average';
         let finalScore = 0;
@@ -97,11 +142,11 @@ export async function POST(req: NextRequest) {
             const totalWeight = votes.reduce((sum, v) => sum + v.weight, 0);
             const validVoteCount = votes.filter(v => v.weight > 0).length;
             const averageScore = validVoteCount > 0 ? totalWeight / validVoteCount : 0;
-            
+
             // Ceiling of average (e.g., 2.3 -> 3 (P2))
             const roundedScore = Math.ceil(averageScore);
             finalScore = roundedScore;
-            
+
             // Map back to P-score
             const scoreToAcuity = { 4: 'P1', 3: 'P2', 2: 'P3', 1: 'P4', 0: 'P4' };
             finalAcuity = scoreToAcuity[roundedScore as keyof typeof scoreToAcuity] || 'P3';
