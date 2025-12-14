@@ -93,7 +93,7 @@ function TriageApp() {
               <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 mt-2">
                 {/* Hackathon Name */}
                 <a
-                  href="https://hackrift-2025.devpost.com"
+                  href="https://hackrift2025.devpost.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-2xl font-bold text-white hover:text-yellow-400 transition-colors flex items-center gap-2"
